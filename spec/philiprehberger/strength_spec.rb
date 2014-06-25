@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'spec_helper'
 RSpec.describe Philiprehberger::Password::Strength do
   describe '.score' do
     it 'returns terrible for empty password' do

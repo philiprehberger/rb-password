@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'spec_helper'
 RSpec.describe Philiprehberger::Password::Generator do
   describe '.generate' do
     it 'generates password of default length' do

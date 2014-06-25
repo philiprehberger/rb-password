@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+require 'spec_helper'
 RSpec.describe Philiprehberger::Password::Policy do
   describe '#validate' do
     let(:policy) { described_class.new }
