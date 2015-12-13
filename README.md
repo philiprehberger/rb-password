@@ -1,10 +1,9 @@
 # philiprehberger-password
 
-[![Tests](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
-[![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://rubygems.org/gems/philiprehberger-password)
-[![License](https://img.shields.io/github/license/philiprehberger/rb-password)](LICENSE)
+[![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://badge.fury.io/rb/philiprehberger-password)
+[![CI](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
 
-Password strength checking, policy validation, and secure generation
+Password strength checking, policy validation, and secure generation.
 
 ## Requirements
 
@@ -20,16 +19,17 @@ gem 'philiprehberger-password'
 
 Or install directly:
 
-```bash
+```sh
 gem install philiprehberger-password
 ```
 
 ## Usage
 
+### Strength Scoring
+
 ```ruby
 require 'philiprehberger/password'
 
-# Strength scoring
 result = Philiprehberger::Password.strength('MyP@ssw0rd!')
 result[:score]    # => 3
 result[:label]    # => :strong
@@ -39,37 +39,34 @@ result[:entropy]  # => 72.08
 ### Policy Validation
 
 ```ruby
-result = Philiprehberger::Password.validate('short',
+policy = Philiprehberger::Password::Policy.new(
   min_length: 12,
   require_uppercase: true,
-  require_digit: true
+  require_digit: true,
+  require_symbol: true,
+  reject_common: true
 )
-result.valid?   # => false
-result.errors   # => ["Must be at least 12 characters", ...]
+
+result = policy.validate('short')
+result.valid?  # => false
+result.errors  # => ["must be at least 12 characters", ...]
+result.score   # => 0
 ```
 
 ### Password Generation
 
 ```ruby
+# Random password
 Philiprehberger::Password.generate(length: 20)
 # => "kX9#mZ2!pQ7@wR4bN5&j"
 
-Philiprehberger::Password.passphrase(words: 4)
-# => "correct-horse-battery-stable"
-```
+# Passphrase
+Philiprehberger::Password.generate(style: :passphrase, words: 4, separator: '-')
+# => "correct-horse-battery-staple"
 
-### Breach Checking
-
-```ruby
-Philiprehberger::Password.breached?('password')  # => true
-Philiprehberger::Password.breached?('xK9#mZ2!')  # => false
-```
-
-### Entropy
-
-```ruby
-Philiprehberger::Password.entropy('abc')       # => 14.1
-Philiprehberger::Password.entropy('aBc123!@')  # => 52.56
+# PIN
+Philiprehberger::Password.generate(style: :pin, length: 6)
+# => "482917"
 ```
 
 ## API
@@ -78,28 +75,47 @@ Philiprehberger::Password.entropy('aBc123!@')  # => 52.56
 
 | Method | Description |
 |--------|-------------|
-| `.strength(password)` | Score 0-4 with label and entropy |
-| `.validate(password, **policy)` | Validate against policy rules |
-| `.entropy(password)` | Calculate entropy in bits |
-| `.generate(length:, charset:)` | Generate secure random password |
-| `.passphrase(words:, separator:)` | Generate word-based passphrase |
-| `.breached?(password)` | Check against common password list |
+| `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
+| `.generate(**options)` | Generate a password (see options below) |
+
+### Generate Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `length` | 16 | Password length |
+| `uppercase` | true | Include uppercase letters |
+| `lowercase` | true | Include lowercase letters |
+| `digits` | true | Include digits |
+| `symbols` | true | Include symbols |
+| `style` | nil | `:passphrase` or `:pin` for alternative styles |
+| `words` | 4 | Word count for passphrase style |
+| `separator` | "-" | Separator for passphrase style |
 
 ### `Philiprehberger::Password::Policy`
 
 | Method | Description |
 |--------|-------------|
-| `.new(**options)` | Create policy with min_length, require_uppercase, etc. |
-| `#validate(password)` | Returns result with `valid?` and `errors` |
+| `.new(**options)` | Create policy (min_length, max_length, require_uppercase, require_lowercase, require_digit, require_symbol, reject_common) |
+| `#validate(password)` | Returns Result with `.valid?`, `.errors`, `.score` |
+
+### Strength Labels
+
+| Score | Label | Entropy |
+|-------|-------|---------|
+| 0 | `:terrible` | < 28 bits |
+| 1 | `:weak` | < 36 bits |
+| 2 | `:fair` | < 60 bits |
+| 3 | `:strong` | < 80 bits |
+| 4 | `:excellent` | >= 80 bits |
 
 ## Development
 
-```bash
+```sh
 bundle install
-bundle exec rspec      # Run tests
-bundle exec rubocop    # Check code style
+bundle exec rspec
+bundle exec rubocop
 ```
 
 ## License
 
-MIT
+MIT License. See [LICENSE](LICENSE) for details.

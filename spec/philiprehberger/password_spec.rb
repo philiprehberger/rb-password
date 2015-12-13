@@ -1,140 +1,167 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
+
 RSpec.describe Philiprehberger::Password do
+  it 'has a version number' do
+    expect(Philiprehberger::Password::VERSION).not_to be_nil
+  end
+
+  describe Philiprehberger::Password::Policy do
+    describe '#validate' do
+      it 'fails for min_length violation' do
+        policy = described_class.new(min_length: 12)
+        result = policy.validate('short')
+        expect(result.valid?).to be false
+        expect(result.errors).to include(a_string_matching(/at least 12/))
+      end
+
+      it 'fails for require_uppercase violation' do
+        policy = described_class.new(require_uppercase: true)
+        result = policy.validate('alllowercase1')
+        expect(result.valid?).to be false
+        expect(result.errors).to include(a_string_matching(/uppercase/))
+      end
+
+      it 'fails for require_digit violation' do
+        policy = described_class.new(require_digit: true)
+        result = policy.validate('NoDigitsHere!')
+        expect(result.valid?).to be false
+        expect(result.errors).to include(a_string_matching(/digit/))
+      end
+
+      it 'fails for require_symbol violation' do
+        policy = described_class.new(require_symbol: true)
+        result = policy.validate('NoSymbols123')
+        expect(result.valid?).to be false
+        expect(result.errors).to include(a_string_matching(/symbol/))
+      end
+
+      it 'passes for valid password meeting all requirements' do
+        policy = described_class.new(
+          min_length: 8,
+          require_uppercase: true,
+          require_lowercase: true,
+          require_digit: true,
+          require_symbol: true
+        )
+        result = policy.validate('MyStr0ng!Pass')
+        expect(result.valid?).to be true
+        expect(result.errors).to be_empty
+      end
+
+      it 'rejects common password "password" when reject_common is true' do
+        policy = described_class.new(reject_common: true)
+        result = policy.validate('password')
+        expect(result.valid?).to be false
+        expect(result.errors).to include(a_string_matching(/common/))
+      end
+
+      it 'rejects common password "123456" when reject_common is true' do
+        policy = described_class.new(reject_common: true)
+        result = policy.validate('123456')
+        expect(result.valid?).to be false
+        expect(result.errors).to include(a_string_matching(/common/))
+      end
+
+      it 'includes a score in the result' do
+        policy = described_class.new
+        result = policy.validate('C0mpl3x!P@ss')
+        expect(result.score).to be_a(Integer)
+        expect(result.score).to be_between(0, 4)
+      end
+    end
+  end
+
   describe '.strength' do
     it 'returns terrible for empty password' do
       result = described_class.strength('')
       expect(result[:score]).to eq(0)
       expect(result[:label]).to eq(:terrible)
+      expect(result[:entropy]).to eq(0.0)
     end
 
-    it 'returns weak for simple password' do
-      result = described_class.strength('abc')
-      expect(result[:score]).to be <= 1
+    it 'returns terrible for single char "a"' do
+      result = described_class.strength('a')
+      expect(result[:score]).to eq(0)
+      expect(result[:label]).to eq(:terrible)
     end
 
-    it 'returns strong for complex password' do
-      result = described_class.strength('C0mpl3x!P@ssw0rd#2026')
+    it 'returns low score for "password123"' do
+      result = described_class.strength('password123')
+      expect(result[:score]).to be <= 2
+    end
+
+    it 'returns high score for complex long password' do
+      result = described_class.strength('C0mpl3x!P@ssw0rd#2026LongEnough')
       expect(result[:score]).to be >= 3
     end
 
-    it 'includes entropy value' do
+    it 'includes entropy as a float' do
       result = described_class.strength('test')
       expect(result[:entropy]).to be_a(Float)
       expect(result[:entropy]).to be > 0
     end
   end
 
-  describe '.entropy' do
-    it 'returns 0 for empty string' do
-      expect(described_class.entropy('')).to eq(0.0)
-    end
-
-    it 'increases with password length' do
-      short = described_class.entropy('abc')
-      long = described_class.entropy('abcdefghij')
-      expect(long).to be > short
-    end
-
-    it 'increases with character diversity' do
-      lower = described_class.entropy('abcdefgh')
-      mixed = described_class.entropy('aBcDeFgH')
-      expect(mixed).to be > lower
-    end
-  end
-
-  describe '.validate' do
-    it 'passes for valid password with default policy' do
-      result = described_class.validate('MyStr0ng!Pass')
-      expect(result.valid?).to be true
-    end
-
-    it 'fails for short password' do
-      result = described_class.validate('short')
-      expect(result.valid?).to be false
-      expect(result.errors).to include(a_string_matching(/at least/))
-    end
-
-    it 'fails for common password' do
-      result = described_class.validate('password')
-      expect(result.valid?).to be false
-      expect(result.errors).to include('Password is too common')
-    end
-
-    it 'enforces uppercase requirement' do
-      result = described_class.validate('lowercase123!', require_uppercase: true)
-      expect(result.valid?).to be false
-      expect(result.errors).to include(a_string_matching(/uppercase/))
-    end
-
-    it 'enforces digit requirement' do
-      result = described_class.validate('NoDigitsHere!', require_digit: true)
-      expect(result.valid?).to be false
-      expect(result.errors).to include(a_string_matching(/digit/))
-    end
-
-    it 'enforces symbol requirement' do
-      result = described_class.validate('NoSymbols123', require_symbol: true)
-      expect(result.valid?).to be false
-      expect(result.errors).to include(a_string_matching(/special/))
-    end
-  end
-
   describe '.generate' do
-    it 'generates password of specified length' do
-      password = described_class.generate(length: 20)
-      expect(password.length).to eq(20)
+    context 'with default style (random)' do
+      it 'generates password of specified length' do
+        password = described_class.generate(length: 20)
+        expect(password.length).to eq(20)
+      end
+
+      it 'includes required character classes by default' do
+        password = described_class.generate(length: 32)
+        expect(password).to match(/[a-z]/)
+        expect(password).to match(/[A-Z]/)
+        expect(password).to match(/\d/)
+      end
+
+      it 'generates unique passwords each time' do
+        passwords = Array.new(10) { described_class.generate }
+        expect(passwords.uniq.length).to eq(10)
+      end
     end
 
-    it 'generates unique passwords' do
-      passwords = Array.new(10) { described_class.generate }
-      expect(passwords.uniq.length).to eq(10)
+    context 'with style: :passphrase' do
+      it 'generates passphrase with correct word count' do
+        phrase = described_class.generate(style: :passphrase, words: 4, separator: '-')
+        words = phrase.split('-')
+        expect(words.length).to eq(4)
+      end
+
+      it 'uses the specified separator' do
+        phrase = described_class.generate(style: :passphrase, words: 3, separator: '.')
+        expect(phrase).to include('.')
+        expect(phrase.split('.').length).to eq(3)
+      end
     end
 
-    it 'includes all character classes by default' do
-      password = described_class.generate(length: 32)
-      expect(password).to match(/[a-z]/)
-      expect(password).to match(/[A-Z]/)
-      expect(password).to match(/\d/)
+    context 'with style: :pin' do
+      it 'generates digits only' do
+        pin = described_class.generate(style: :pin, length: 6)
+        expect(pin).to match(/\A\d+\z/)
+      end
+
+      it 'generates correct length' do
+        pin = described_class.generate(style: :pin, length: 6)
+        expect(pin.length).to eq(6)
+      end
     end
   end
 
-  describe '.passphrase' do
-    it 'generates passphrase with default word count' do
-      phrase = described_class.passphrase
-      words = phrase.split('-')
-      expect(words.length).to eq(4)
+  describe 'edge cases' do
+    it 'handles empty password in policy' do
+      policy = Philiprehberger::Password::Policy.new
+      result = policy.validate('')
+      expect(result.valid?).to be false
     end
 
-    it 'respects custom word count' do
-      phrase = described_class.passphrase(words: 6)
-      words = phrase.split('-')
-      expect(words.length).to eq(6)
-    end
-
-    it 'supports custom separator' do
-      phrase = described_class.passphrase(separator: '.')
-      expect(phrase).to include('.')
-    end
-  end
-
-  describe '.breached?' do
-    it 'returns true for common passwords' do
-      expect(described_class.breached?('password')).to be true
-      expect(described_class.breached?('123456')).to be true
-    end
-
-    it 'returns false for unique passwords' do
-      expect(described_class.breached?('xK9#mZ2!pQ7@wR4')).to be false
-    end
-
-    it 'is case insensitive' do
-      expect(described_class.breached?('PASSWORD')).to be true
-    end
-
-    it 'returns false for nil or empty' do
-      expect(described_class.breached?(nil)).to be false
-      expect(described_class.breached?('')).to be false
+    it 'handles very long password in strength' do
+      long_pw = 'A1b!' * 100
+      result = described_class.strength(long_pw)
+      expect(result[:score]).to eq(4)
     end
   end
 end

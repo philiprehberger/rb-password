@@ -1,5 +1,7 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
+
 RSpec.describe Philiprehberger::Password::Generator do
   describe '.generate' do
     it 'generates password of default length' do
@@ -24,37 +26,31 @@ RSpec.describe Philiprehberger::Password::Generator do
       expect(password).to match(/\d/)
     end
 
-    it 'supports alpha charset' do
-      password = described_class.generate(length: 20, charset: :alpha)
+    it 'generates letters only when symbols and digits disabled' do
+      password = described_class.generate(length: 20, digits: false, symbols: false)
       expect(password).to match(/\A[a-zA-Z]+\z/)
     end
 
-    it 'supports alphanumeric charset' do
-      password = described_class.generate(length: 20, charset: :alphanumeric)
-      expect(password).to match(/\A[a-zA-Z0-9]+\z/)
-    end
-
-    it 'supports digits charset' do
-      password = described_class.generate(length: 10, charset: :digits)
+    it 'generates digits only with pin style' do
+      password = described_class.generate(length: 6, style: :pin)
       expect(password).to match(/\A\d+\z/)
+      expect(password.length).to eq(6)
     end
-  end
 
-  describe '.passphrase' do
-    it 'generates passphrase with default settings' do
-      phrase = described_class.passphrase
+    it 'generates passphrase with style option' do
+      phrase = described_class.generate(style: :passphrase)
       words = phrase.split('-')
       expect(words.length).to eq(4)
       expect(words).to all(match(/\A[a-z]+\z/))
     end
 
-    it 'supports custom word count' do
-      phrase = described_class.passphrase(words: 6)
+    it 'supports custom word count for passphrase' do
+      phrase = described_class.generate(style: :passphrase, words: 6)
       expect(phrase.split('-').length).to eq(6)
     end
 
-    it 'supports custom separator' do
-      phrase = described_class.passphrase(separator: '_')
+    it 'supports custom separator for passphrase' do
+      phrase = described_class.generate(style: :passphrase, separator: '_')
       expect(phrase).to include('_')
       expect(phrase).not_to include('-')
     end
