@@ -15,7 +15,7 @@ Password strength checking, policy validation, and secure generation
 Add to your Gemfile:
 
 ```ruby
-gem 'philiprehberger-password'
+gem "philiprehberger-password"
 ```
 
 Or install directly:
