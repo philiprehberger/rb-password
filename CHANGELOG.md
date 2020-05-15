@@ -7,6 +7,20 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-28
+
+### Added
+- Common password dictionary with 10,000+ entries stored as a frozen Set for O(1) lookup
+- Keyboard pattern detection: `Password.keyboard_patterns(pwd)` detects QWERTY rows, alphabetic/numeric sequences, and repeated characters
+- Context-aware policy validation: `policy.validate(pwd, context: { username:, email:, app_name: })` rejects passwords containing personal information
+- Password hashing integration via bcrypt wrapper: `Password.hash(pwd, cost: 12)` and `Password.verify(pwd, hash)` with lazy loading and helpful error if bcrypt is not installed
+- Expanded passphrase word list from 41 to 200+ words sourced from BIP39/EFF lists
+- zxcvbn-style strength estimation: `Password.zxcvbn(pwd)` returns pattern-based scoring with dictionary word detection, l33t substitution detection, spatial keyboard patterns, and date patterns
+
+### Changed
+- Policy now uses expanded CommonPasswords dictionary instead of inline ~100 password list
+- Generator WORD_LIST expanded to 200+ unique lowercase words for better passphrase entropy
+
 ## [0.1.9] - 2026-03-26
 
 ### Fixed
@@ -67,5 +81,6 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PIN generation (digits only)
 - Built-in list of ~100 common passwords for rejection
 
-[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/philiprehberger/rb-password/compare/v0.1.9...v0.2.0
 [0.1.0]: https://github.com/philiprehberger/rb-password/releases/tag/v0.1.0

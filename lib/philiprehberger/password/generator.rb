@@ -10,6 +10,8 @@ module Philiprehberger
       DIGITS = ('0'..'9').to_a.freeze
       SYMBOLS = %w[! @ # $ % ^ & * - _ + = . ? ~].freeze
 
+      # Expanded word list (200+ words) sourced from BIP39 and EFF short wordlists.
+      # All words are lowercase, 3-8 characters, easy to type and remember.
       WORD_LIST = %w[
         abandon ability able about above absent absorb abstract absurd abuse access
         account accuse achieve acid across action actor actual adapt adjust admit
@@ -38,7 +40,92 @@ module Philiprehberger
         coconut code coffee coil collect color column combine comfort comic common
         company concert confirm congress connect consider control convince cool copper
         coral core correct cost cotton country couple course cousin cover craft crane
-      ].freeze
+        crash crazy cream credit crew cricket crime crisp critic crop cross crouch
+        crowd crucial cruel cruise crumble crush crystal cube culture cup curtain curve
+        cycle damage dance danger daring dash daughter dawn debate decade december decide
+        decline decorate decrease defeat define degree delay deliver demand denial depend
+        deposit depth deputy derive desert design detail detect develop device devote
+        diagram diamond diary diesel differ digital dignity dilemma dinner dinosaur direct
+        discover disease dish dismiss display distance divert divide doctor dolphin domain
+        donkey donor door dose double dove draft dragon drama drastic dream dress drift
+        drink drip drive drop drum dry duck dumb dune during dust dutch dwarf dynamic
+        eager eagle early earn earth easily east echo ecology edge edit educate effort
+        eight either elbow elder electric elegant element elephant elite embark embrace
+        emerge emotion employ empower empty enable endorse enemy energy enforce engage
+        engine enhance enjoy enrich enroll entire entry envelope episode equal equip
+        erase erode erosion error erupt escape essay essence estate eternal evaluate
+        evening evidence evil evolve exact example excess exchange excite exclude excuse
+        execute exercise exhaust exhibit exile exist expand expect expire explain expose
+        express extend extra eye fabric face faculty faint faith fall famous fancy fantasy
+        farm fashion father fatigue fault favorite feature federal feel female fence
+        festival fetch fever fiction field figure file film filter final find finger
+        finish fire firm fiscal fish fitness flag flame flash flat flavor flee flight
+        flip float flock floor flower fluid flush foam focus fold follow food force
+        forest forget fork fortune forum forward fossil found frame frequent fresh friend
+        fringe frog front frozen fruit fuel fun funny future gadget galaxy garden garlic
+        garment gather gauge gaze general genius genre gentle gesture giant gift giggle
+        ginger giraffe glance glare glass globe gloom glory glove glow glue goat golden
+        good gospel gossip govern gown grab grace grain grant grape grass gravity great
+        grid grief grit group grow guard guess guide guitar gun gym habit half hammer
+        happy harbor hard harvest hawk hazard health heart heavy hedgehog height hero
+        hidden high hint hip history hobby hold hollow home hope horror horse hospital
+        host hour hover hub huge human humble humor hundred hungry hurdle hurry hurt
+        hybrid ice icon idea identify idle ignore image imitate immune impact impose
+        improve impulse inch include income index infant initial injury inner input
+        inquiry insane inside inspire install intact interest invest invite involve iron
+        island isolate item ivory jacket jaguar jar jazz jealous jelly jewel job join
+        joke journey judge juice jump jungle jury justice kangaroo keen keep kernel key
+        kick kidney kind kingdom kitchen kite kiwi knee knife knock know label ladder
+        lake lamp language laptop large later laugh laundry layer leader leaf learn leave
+        lecture legend leisure lemon length lens letter level liberty library license lift
+        light limb limit link liquid list little live lizard loan lobster local lonely
+        loop lottery loud lounge loyal lucky lumber lunch luxury lyrics machine magic
+        magnet maid major make manage mandate mango mansion maple marble margin marine
+        market marriage master match material matrix maximum meadow meaning measure media
+        melody member memory mention merge method middle migrate million mimic minimum
+        miracle mirror misery modify moment monitor monkey monster month moral morning
+        mosquito mother motion mountain mouse movie much multiply muscle museum music
+        mutual mystery myth naive name napkin narrow nature neck negative neglect neither
+        nephew nerve network neutral never noise normal north notable nothing novel nuclear
+        number nurse object observe obtain obvious occur ocean october odor office often
+        olive olympic opera opinion oppose option orange orbit orchard ordinary organ orient
+        orphan ostrich other outdoor output oval oven owner oxygen oyster ozone pact paddle
+        pair palace panda panel panic panther paper parade parent park patrol pattern pause
+        peanut pepper perfect period permit photo phrase piano picnic picture piece pilot
+        pioneer pizza planet plastic play please pledge pluck plug plunge poem point polar
+        portion position possible potato pottery poverty power practice prefer prepare
+        present pretty prevent pride primary print priority prison private prize problem
+        process produce profit program promote proof property prosper protect proud provide
+        public pulse pumpkin punch pupil purchase puzzle pyramid quality quarter question
+        quick quiz quote rabbit raccoon radar rail ranch random range rapid raven razor
+        ready rebel recall receive recipe record recycle reform region regular reject
+        relax release relief remain remember remind render repair repeat replace require
+        resist resource result retire retreat reveal rhythm rice ride rifle ring ritual
+        river road robot robust rocket romance rough route royal rubber rude runway rural
+        saddle safe salad salmon salon salt salute sample sand satisfy sauce sausage scale
+        scatter scene school science scissors search season second secret security segment
+        select senior sense sentence series service settle setup seven shadow shallow share
+        shed shell sheriff shield shift shine ship shock shoot shop shoulder shove shuffle
+        sibling sick side siege sight silk silver similar simple since sister sketch skill
+        slender slice slim slogan slot small smile smoke smooth snake social socket solar
+        soldier solution someone song source south space spare speak special spend sphere
+        spider spirit split spray spread spring square stable stadium staff stage stamp
+        stand start state stay steak steel stem step stick still stock stomach stone
+        story strategy street strong student stuff style subject submit sugar suggest
+        summer supply surface survey suspect sweet swim symbol symptom system table tackle
+        talent target tattoo teach team tenant tennis tent theory thick thought three
+        timber tissue title toast today together token tomato tone tongue tool toward tower
+        trade traffic train transfer travel tree trend trial trigger trim trophy trouble
+        truck truly trumpet trust tumble tunnel turkey turn twelve twenty twice type ugly
+        umbrella unable uncle under unfair unique universe unknown unlock until unusual
+        unveil update upgrade upon urban usage useful usual utility vacant valid valley
+        vampire vanilla various vault vehicle velvet vendor venture version veteran viable
+        village vintage violin virtual virus visual vital vivid vocal voice volcano volume
+        voyage wage wagon waitress walnut warfare warm warrior water weapon weather wedding
+        weekend weird welcome western whale wheat when whisper width wild window winter
+        wisdom within wolf wonder world worth wreck wrestle wrist wrong yard young youth
+        zebra zero zone
+      ].uniq.freeze
 
       def self.generate(length: 16, uppercase: true, lowercase: true, digits: true, symbols: true, style: nil,
                         words: 4, separator: '-')

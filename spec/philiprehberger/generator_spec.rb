@@ -55,4 +55,24 @@ RSpec.describe Philiprehberger::Password::Generator do
       expect(phrase).not_to include('-')
     end
   end
+
+  describe 'WORD_LIST' do
+    it 'contains 100+ words' do
+      expect(described_class::WORD_LIST.length).to be > 100
+    end
+
+    it 'contains only lowercase words' do
+      described_class::WORD_LIST.each do |word|
+        expect(word).to match(/\A[a-z]+\z/), "Expected '#{word}' to be lowercase letters only"
+      end
+    end
+
+    it 'is frozen' do
+      expect(described_class::WORD_LIST).to be_frozen
+    end
+
+    it 'has no duplicates' do
+      expect(described_class::WORD_LIST.length).to eq(described_class::WORD_LIST.uniq.length)
+    end
+  end
 end

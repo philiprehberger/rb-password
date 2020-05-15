@@ -10,8 +10,10 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Password strength checking, policy validation, and secure generation'
   spec.description = 'Validate passwords against configurable policies (length, complexity, ' \
-                     'common password dictionary), score strength with entropy-based analysis, ' \
-                     'and generate secure random passwords, passphrases, and PINs.'
+                     'common password dictionary, context-aware checks), score strength with ' \
+                     'entropy-based and zxcvbn-style analysis, detect keyboard patterns and ' \
+                     'sequences, hash with bcrypt, and generate secure random passwords, ' \
+                     'passphrases, and PINs.'
   spec.homepage = 'https://github.com/philiprehberger/rb-password'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.1'
