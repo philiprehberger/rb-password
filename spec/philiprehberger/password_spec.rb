@@ -7,8 +7,8 @@ RSpec.describe Philiprehberger::Password do
     expect(Philiprehberger::Password::VERSION).not_to be_nil
   end
 
-  it 'has version 0.2.0' do
-    expect(Philiprehberger::Password::VERSION).to eq('0.2.0')
+  it 'has version 0.2.1' do
+    expect(Philiprehberger::Password::VERSION).to eq('0.2.1')
   end
 
   describe Philiprehberger::Password::Policy do
