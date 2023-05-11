@@ -14,14 +14,14 @@ Gem::Specification.new do |spec|
                      'entropy-based and zxcvbn-style analysis, detect keyboard patterns and ' \
                      'sequences, hash with bcrypt, and generate secure random passwords, ' \
                      'passphrases, and PINs.'
-  spec.homepage      = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-password'
+  spec.homepage = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-password'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.1'
 
   spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri']       = 'https://github.com/philiprehberger/rb-password'
-  spec.metadata['changelog_uri']         = 'https://github.com/philiprehberger/rb-password/blob/main/CHANGELOG.md'
-  spec.metadata['bug_tracker_uri']       = 'https://github.com/philiprehberger/rb-password/issues'
+  spec.metadata['source_code_uri'] = 'https://github.com/philiprehberger/rb-password'
+  spec.metadata['changelog_uri'] = 'https://github.com/philiprehberger/rb-password/blob/main/CHANGELOG.md'
+  spec.metadata['bug_tracker_uri'] = 'https://github.com/philiprehberger/rb-password/issues'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files = Dir['lib/**/*', 'LICENSE', 'README.md', 'CHANGELOG.md']
