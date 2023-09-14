@@ -7,8 +7,8 @@ RSpec.describe Philiprehberger::Password do
     expect(Philiprehberger::Password::VERSION).not_to be_nil
   end
 
-  it 'has version 0.2.2' do
-    expect(Philiprehberger::Password::VERSION).to eq('0.2.2')
+  it 'has version 0.3.0' do
+    expect(Philiprehberger::Password::VERSION).to eq('0.3.0')
   end
 
   describe Philiprehberger::Password::Policy do
@@ -74,6 +74,24 @@ RSpec.describe Philiprehberger::Password do
         expect(result.score).to be_a(Integer)
         expect(result.score).to be_between(0, 4)
       end
+    end
+  end
+
+  describe '.common?' do
+    it 'returns true for known common passwords' do
+      expect(described_class.common?('password')).to be true
+      expect(described_class.common?('123456')).to be true
+      expect(described_class.common?('qwerty')).to be true
+    end
+
+    it 'returns true regardless of case' do
+      expect(described_class.common?('PASSWORD')).to be true
+      expect(described_class.common?('Password')).to be true
+    end
+
+    it 'returns false for uncommon passwords' do
+      expect(described_class.common?('xK9#mZ2!pQ7@wR4b')).to be false
+      expect(described_class.common?('notacommonpassword99!')).to be false
     end
   end
 

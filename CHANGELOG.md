@@ -7,6 +7,15 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-05
+
+### Added
+- `Password.common?(password)` method for standalone common password checking
+- `custom_passwords:` option on `Policy.new` for supplying additional banned passwords
+
+### Fixed
+- Gemspec author, email, Ruby version format, and files glob to match template guide
+
 ## [0.2.2] - 2026-03-31
 
 ### Added
@@ -91,6 +100,7 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PIN generation (digits only)
 - Built-in list of ~100 common passwords for rejection
 
-[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/philiprehberger/rb-password/compare/v0.2.2...v0.3.0
 [0.2.0]: https://github.com/philiprehberger/rb-password/compare/v0.1.9...v0.2.0
 [0.1.0]: https://github.com/philiprehberger/rb-password/releases/tag/v0.1.0

@@ -6,7 +6,7 @@ module Philiprehberger
       Result = Struct.new(:valid?, :errors, :score, keyword_init: true)
 
       def initialize(min_length: 8, max_length: 128, require_uppercase: false, require_lowercase: false,
-                     require_digit: false, require_symbol: false, reject_common: true)
+                     require_digit: false, require_symbol: false, reject_common: true, custom_passwords: [])
         @min_length = min_length
         @max_length = max_length
         @require_uppercase = require_uppercase
@@ -14,6 +14,7 @@ module Philiprehberger
         @require_digit = require_digit
         @require_symbol = require_symbol
         @reject_common = reject_common
+        @custom_passwords = Set.new(custom_passwords.map { |p| p.to_s.downcase }).freeze
       end
 
       # Validate a password against the policy.
@@ -36,6 +37,9 @@ module Philiprehberger
         errors << 'must contain at least one digit' if @require_digit && !pwd.match?(/\d/)
         errors << 'must contain at least one symbol' if @require_symbol && !pwd.match?(/[^a-zA-Z\d]/)
         errors << 'password is too common' if @reject_common && CommonPasswords.include?(pwd)
+        if @custom_passwords.include?(pwd.downcase) && !errors.include?('password is too common')
+          errors << 'password is too common'
+        end
 
         # Context-aware validation
         errors.concat(validate_context(pwd, context)) unless context.nil? || context.empty?
