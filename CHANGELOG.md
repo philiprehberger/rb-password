@@ -7,6 +7,11 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-15
+
+### Added
+- `Password.entropy(password)` — top-level accessor for the entropy-bits estimate already exposed by `Strength`
+
 ## [0.3.3] - 2026-04-09
 
 ### Fixed

@@ -25,6 +25,15 @@ module Philiprehberger
       Strength.compute(password)
     end
 
+    # Estimated entropy of the password in bits (log2(pool_size ^ length)).
+    # Pool size is inferred from the character classes present.
+    #
+    # @param password [String] the password to evaluate
+    # @return [Float] estimated entropy in bits (0.0 for empty passwords)
+    def self.entropy(password)
+      Strength.entropy(password)
+    end
+
     def self.generate(**options)
       Generator.generate(**options)
     end

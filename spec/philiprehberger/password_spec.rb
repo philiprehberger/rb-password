@@ -95,6 +95,22 @@ RSpec.describe Philiprehberger::Password do
     end
   end
 
+  describe '.entropy' do
+    it 'returns 0.0 for an empty password' do
+      expect(described_class.entropy('')).to eq(0.0)
+    end
+
+    it 'returns a positive estimate for lowercase-only passwords' do
+      expect(described_class.entropy('abcdef')).to be > 0
+    end
+
+    it 'returns a larger estimate when multiple character classes are present' do
+      simple = described_class.entropy('abcdef')
+      complex = described_class.entropy('Abc!ef9#')
+      expect(complex).to be > simple
+    end
+  end
+
   describe '.strength' do
     it 'returns terrible for empty password' do
       result = described_class.strength('')
