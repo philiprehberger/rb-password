@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Philiprehberger
   module Password
     COMMON_PASSWORDS = %w[
