@@ -1,6 +1,7 @@
 # philiprehberger-password
 
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://badge.fury.io/rb/philiprehberger-password)
+$badge_line
 [![CI](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
 
 Password strength checking, policy validation, and secure generation.
