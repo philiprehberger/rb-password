@@ -1,35 +1,36 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 RSpec.describe Philiprehberger::Password::Strength do
-  describe '.score' do
+  describe '.compute' do
     it 'returns terrible for empty password' do
-      result = described_class.score('')
+      result = described_class.compute('')
       expect(result[:score]).to eq(0)
       expect(result[:label]).to eq(:terrible)
     end
 
     it 'returns terrible for nil' do
-      result = described_class.score(nil)
+      result = described_class.compute(nil)
       expect(result[:score]).to eq(0)
     end
 
     it 'returns weak for short lowercase' do
-      result = described_class.score('abcde')
+      result = described_class.compute('abcde')
       expect(result[:score]).to be <= 1
     end
 
     it 'returns fair for medium password' do
-      result = described_class.score('Abcdefgh1')
+      result = described_class.compute('Abcdefgh1')
       expect(result[:score]).to be >= 2
     end
 
     it 'returns strong or excellent for long complex password' do
-      result = described_class.score('C0mpl3x!P@ssw0rd#2026Extra')
+      result = described_class.compute('C0mpl3x!P@ssw0rd#2026Extra')
       expect(result[:score]).to be >= 3
     end
 
     it 'includes entropy' do
-      result = described_class.score('test')
+      result = described_class.compute('test')
       expect(result[:entropy]).to be_a(Float)
     end
   end
