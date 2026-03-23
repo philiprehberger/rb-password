@@ -4,7 +4,7 @@
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://rubygems.org/gems/philiprehberger-password)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-password)](LICENSE)
 
-Password strength checking, policy validation, and secure generation.
+Password strength checking, policy validation, and secure generation
 
 ## Requirements
 
@@ -20,7 +20,7 @@ gem 'philiprehberger-password'
 
 Or install directly:
 
-```sh
+```bash
 gem install philiprehberger-password
 ```
 
@@ -111,7 +111,7 @@ Philiprehberger::Password.generate(style: :pin, length: 6)
 
 ## Development
 
-```sh
+```bash
 bundle install
 bundle exec rspec
 bundle exec rubocop
@@ -119,4 +119,4 @@ bundle exec rubocop
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
+MIT
