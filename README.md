@@ -1,8 +1,8 @@
 # philiprehberger-password
 
-[![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://badge.fury.io/rb/philiprehberger-password)
-$badge_line
-[![CI](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
+[![Tests](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
+[![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://rubygems.org/gems/philiprehberger-password)
+[![License](https://img.shields.io/github/license/philiprehberger/rb-password)](LICENSE)
 
 Password strength checking, policy validation, and secure generation.
 
