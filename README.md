@@ -29,7 +29,7 @@ gem install philiprehberger-password
 ### Strength Scoring
 
 ```ruby
-require 'philiprehberger/password'
+require "philiprehberger/password"
 
 result = Philiprehberger::Password.strength('MyP@ssw0rd!')
 result[:score]    # => 3
