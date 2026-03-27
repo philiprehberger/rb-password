@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://rubygems.org/gems/philiprehberger-password)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-password)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Password strength checking, policy validation, and secure generation
 
@@ -119,4 +120,4 @@ bundle exec rubocop
 
 ## License
 
-MIT
+[MIT](LICENSE)
