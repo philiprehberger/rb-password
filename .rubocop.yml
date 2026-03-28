@@ -61,9 +61,11 @@ Metrics/PerceivedComplexity:
 
 Metrics/ClassLength:
   Max: 300
+  Exclude:
+    - "lib/philiprehberger/password/common_passwords.rb"
 
 Metrics/ModuleLength:
-  Max: 300
+  Max: 600
 
 Metrics/ParameterLists:
   Max: 8
@@ -72,7 +74,9 @@ Metrics/CollectionLiteralLength:
   Enabled: false
 
 Layout/LineLength:
-  Max: 140
+  Max: 160
+  Exclude:
+    - "lib/philiprehberger/password/common_passwords.rb"
 
 Layout/EndOfLine:
   Enabled: false

@@ -7,6 +7,10 @@ RSpec.describe Philiprehberger::Password do
     expect(Philiprehberger::Password::VERSION).not_to be_nil
   end
 
+  it 'has version 0.2.0' do
+    expect(Philiprehberger::Password::VERSION).to eq('0.2.0')
+  end
+
   describe Philiprehberger::Password::Policy do
     describe '#validate' do
       it 'fails for min_length violation' do
@@ -148,6 +152,48 @@ RSpec.describe Philiprehberger::Password do
         pin = described_class.generate(style: :pin, length: 6)
         expect(pin.length).to eq(6)
       end
+    end
+  end
+
+  describe '.keyboard_patterns' do
+    it 'returns an array' do
+      result = described_class.keyboard_patterns('test')
+      expect(result).to be_an(Array)
+    end
+
+    it 'detects qwerty row patterns' do
+      result = described_class.keyboard_patterns('myqwertypass')
+      expect(result).not_to be_empty
+      expect(result.any? { |p| p[:type] == :keyboard_row }).to be true
+    end
+
+    it 'detects repeated characters' do
+      result = described_class.keyboard_patterns('aaabbb')
+      expect(result.any? { |p| p[:type] == :repeated }).to be true
+    end
+
+    it 'detects numeric sequences' do
+      result = described_class.keyboard_patterns('abc123456def')
+      expect(result.any? { |p| p[:type] == :sequence }).to be true
+    end
+  end
+
+  describe '.zxcvbn' do
+    it 'returns a hash with score, patterns, and crack_time_display' do
+      result = described_class.zxcvbn('password123')
+      expect(result).to have_key(:score)
+      expect(result).to have_key(:patterns)
+      expect(result).to have_key(:crack_time_display)
+    end
+
+    it 'gives low score to common passwords' do
+      result = described_class.zxcvbn('password')
+      expect(result[:score]).to be <= 1
+    end
+
+    it 'gives high score to complex passwords' do
+      result = described_class.zxcvbn('X9#kZ!mQ7@wR4bN5&jP2cL8')
+      expect(result[:score]).to be >= 3
     end
   end
 

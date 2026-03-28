@@ -1,15 +1,13 @@
 # philiprehberger-password
 
-[![Tests](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml)
-[![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://rubygems.org/gems/philiprehberger-password)
-[![License](https://img.shields.io/github/license/philiprehberger/rb-password)](LICENSE)
-[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
+[![Tests](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-password/actions/workflows/ci.yml) [![Gem Version](https://img.shields.io/gem/v/philiprehberger-password)](https://rubygems.org/gems/philiprehberger-password) [![GitHub release](https://img.shields.io/github/v/release/philiprehberger/rb-password)](https://github.com/philiprehberger/rb-password/releases) [![GitHub last commit](https://img.shields.io/github/last-commit/philiprehberger/rb-password)](https://github.com/philiprehberger/rb-password/commits/main) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Bug Reports](https://img.shields.io/badge/bug-reports-red.svg)](https://github.com/philiprehberger/rb-password/issues) [![Feature Requests](https://img.shields.io/badge/feature-requests-blue.svg)](https://github.com/philiprehberger/rb-password/issues) [![GitHub Sponsors](https://img.shields.io/badge/sponsor-philiprehberger-ea4aaa.svg?logo=github)](https://github.com/sponsors/philiprehberger)
 
-Password strength checking, policy validation, and secure generation
+Password strength checking, policy validation, pattern detection, hashing, and secure generation.
 
 ## Requirements
 
 - Ruby >= 3.1
+- bcrypt gem (optional, for password hashing only)
 
 ## Installation
 
@@ -32,7 +30,7 @@ gem install philiprehberger-password
 ```ruby
 require "philiprehberger/password"
 
-result = Philiprehberger::Password.strength('MyP@ssw0rd!')
+result = Philiprehberger::Password.strength("MyP@ssw0rd!")
 result[:score]    # => 3
 result[:label]    # => :strong
 result[:entropy]  # => 72.08
@@ -49,10 +47,49 @@ policy = Philiprehberger::Password::Policy.new(
   reject_common: true
 )
 
-result = policy.validate('short')
+result = policy.validate("short")
 result.valid?  # => false
 result.errors  # => ["must be at least 12 characters", ...]
 result.score   # => 0
+```
+
+### Context-Aware Validation
+
+```ruby
+policy = Philiprehberger::Password::Policy.new
+
+result = policy.validate("johndoe2024!", context: {
+  username: "johndoe",
+  email: "johndoe@example.com",
+  app_name: "myapp"
+})
+result.valid?  # => false
+result.errors  # => ["must not contain your username", "must not contain your email username"]
+```
+
+### Keyboard Pattern Detection
+
+```ruby
+patterns = Philiprehberger::Password.keyboard_patterns("qwertyaaa123456")
+# => [
+#   { type: :keyboard_row, token: "qwerty", start: 0, length: 6, direction: :forward },
+#   { type: :repeated, token: "aaa", start: 6, length: 3, repeated_char: "a" },
+#   { type: :sequence, token: "123456", start: 9, length: 6, sequence_type: :numeric, direction: :ascending }
+# ]
+```
+
+### Password Hashing
+
+```ruby
+# Requires bcrypt gem: gem install bcrypt
+hash = Philiprehberger::Password.hash("my-secret-password", cost: 12)
+# => "$2a$12$..."
+
+Philiprehberger::Password.verify("my-secret-password", hash)
+# => true
+
+Philiprehberger::Password.verify("wrong-password", hash)
+# => false
 ```
 
 ### Password Generation
@@ -62,13 +99,22 @@ result.score   # => 0
 Philiprehberger::Password.generate(length: 20)
 # => "kX9#mZ2!pQ7@wR4bN5&j"
 
-# Passphrase
-Philiprehberger::Password.generate(style: :passphrase, words: 4, separator: '-')
+# Passphrase (200+ word list)
+Philiprehberger::Password.generate(style: :passphrase, words: 4, separator: "-")
 # => "correct-horse-battery-staple"
 
 # PIN
 Philiprehberger::Password.generate(style: :pin, length: 6)
 # => "482917"
+```
+
+### zxcvbn-Style Strength Estimation
+
+```ruby
+result = Philiprehberger::Password.zxcvbn("p@ssw0rd123")
+result[:score]              # => 1
+result[:crack_time_display] # => "minutes"
+result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 ```
 
 ## API
@@ -79,6 +125,10 @@ Philiprehberger::Password.generate(style: :pin, length: 6)
 |--------|-------------|
 | `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
 | `.generate(**options)` | Generate a password (see options below) |
+| `.keyboard_patterns(password)` | Returns array of detected keyboard/sequence/repeat patterns |
+| `.hash(password, cost: 12)` | Hash password with bcrypt (requires bcrypt gem) |
+| `.verify(password, hash)` | Verify password against bcrypt hash (requires bcrypt gem) |
+| `.zxcvbn(password)` | Returns hash with `:score` (0-4), `:patterns`, `:crack_time_display` |
 
 ### Generate Options
 
@@ -98,7 +148,7 @@ Philiprehberger::Password.generate(style: :pin, length: 6)
 | Method | Description |
 |--------|-------------|
 | `.new(**options)` | Create policy (min_length, max_length, require_uppercase, require_lowercase, require_digit, require_symbol, reject_common) |
-| `#validate(password)` | Returns Result with `.valid?`, `.errors`, `.score` |
+| `#validate(password, context: {})` | Returns Result with `.valid?`, `.errors`, `.score`. Context accepts `:username`, `:email`, `:app_name` |
 
 ### Strength Labels
 
@@ -110,6 +160,17 @@ Philiprehberger::Password.generate(style: :pin, length: 6)
 | 3 | `:strong` | < 80 bits |
 | 4 | `:excellent` | >= 80 bits |
 
+### zxcvbn Pattern Types
+
+| Type | Description |
+|------|-------------|
+| `:dictionary` | Common password or known word detected |
+| `:leet` | L33t-speak substitution of a known word |
+| `:spatial` | QWERTY keyboard adjacency pattern |
+| `:date` | Date pattern (yyyy, mm/dd/yyyy, etc.) |
+| `:sequence` | Alphabetic or numeric sequence |
+| `:repeated` | Repeated characters |
+
 ## Development
 
 ```bash
@@ -117,6 +178,10 @@ bundle install
 bundle exec rspec
 bundle exec rubocop
 ```
+
+## Support
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Philip%20Rehberger-blue?logo=linkedin)](https://linkedin.com/in/philiprehberger) [![More Packages](https://img.shields.io/badge/more-packages-blue.svg)](https://github.com/philiprehberger?tab=repositories)
 
 ## License
 
