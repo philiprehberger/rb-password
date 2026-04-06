@@ -38,6 +38,13 @@ result[:label]    # => :strong
 result[:entropy]  # => 72.08
 ```
 
+### Common Password Check
+
+```ruby
+Philiprehberger::Password.common?("password")   # => true
+Philiprehberger::Password.common?("xK9#mZ2!pQ") # => false
+```
+
 ### Policy Validation
 
 ```ruby
@@ -46,7 +53,8 @@ policy = Philiprehberger::Password::Policy.new(
   require_uppercase: true,
   require_digit: true,
   require_symbol: true,
-  reject_common: true
+  reject_common: true,
+  custom_passwords: ["companyname", "internalpass"]
 )
 
 result = policy.validate("short")
@@ -125,6 +133,7 @@ result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 
 | Method | Description |
 |--------|-------------|
+| `.common?(password)` | Returns `true` if password is in the common password dictionary |
 | `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
 | `.generate(**options)` | Generate a password (see options below) |
 | `.keyboard_patterns(password)` | Returns array of detected keyboard/sequence/repeat patterns |
@@ -149,7 +158,7 @@ result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 
 | Method | Description |
 |--------|-------------|
-| `.new(**options)` | Create policy (min_length, max_length, require_uppercase, require_lowercase, require_digit, require_symbol, reject_common) |
+| `.new(**options)` | Create policy (min_length, max_length, require_uppercase, require_lowercase, require_digit, require_symbol, reject_common, custom_passwords) |
 | `#validate(password, context: {})` | Returns Result with `.valid?`, `.errors`, `.score`. Context accepts `:username`, `:email`, `:app_name` |
 
 ### Strength Labels

@@ -76,6 +76,29 @@ RSpec.describe Philiprehberger::Password::Policy do
       end
     end
 
+    context 'with custom_passwords option' do
+      let(:policy_with_custom) do
+        described_class.new(custom_passwords: %w[companyname internalpass])
+      end
+
+      it 'rejects passwords matching a custom banned password' do
+        result = policy_with_custom.validate('CompanyName')
+        expect(result.valid?).to be false
+        expect(result.errors).to include('password is too common')
+      end
+
+      it 'rejects custom passwords case-insensitively' do
+        result = policy_with_custom.validate('INTERNALPASS')
+        expect(result.valid?).to be false
+        expect(result.errors).to include('password is too common')
+      end
+
+      it 'allows passwords not in the custom or common lists' do
+        result = policy_with_custom.validate('Str0ng!Unique#Pwd')
+        expect(result.valid?).to be true
+      end
+    end
+
     context 'with context-aware validation' do
       it 'rejects passwords containing username' do
         result = policy.validate('myjohnpass1', context: { username: 'john' })

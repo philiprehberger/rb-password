@@ -13,6 +13,14 @@ require_relative 'password/zxcvbn'
 
 module Philiprehberger
   module Password
+    # Check if a password appears in the common password dictionary.
+    #
+    # @param password [String] the password to check
+    # @return [Boolean] true if the password is common
+    def self.common?(password)
+      CommonPasswords.include?(password.to_s.downcase)
+    end
+
     def self.strength(password)
       Strength.compute(password)
     end
