@@ -4,7 +4,7 @@
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-password.svg)](https://rubygems.org/gems/philiprehberger-password)
 [![Last updated](https://img.shields.io/github/last-commit/philiprehberger/rb-password)](https://github.com/philiprehberger/rb-password/commits/main)
 
-Password strength checking, policy validation, pattern detection, hashing, and secure generation.
+Password strength checking, policy validation, pattern detection, hashing, and secure generation
 
 ## Requirements
 

@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ['Philip Rehberger']
   spec.email = ['me@philiprehberger.com']
 
-  spec.summary = 'Password strength checking, policy validation, and secure generation'
+  spec.summary = 'Password strength checking, policy validation, pattern detection, hashing, and secure generation'
   spec.description = 'Validate passwords against configurable policies (length, complexity, ' \
                      'common password dictionary, context-aware checks), score strength with ' \
                      'entropy-based and zxcvbn-style analysis, detect keyboard patterns and ' \
