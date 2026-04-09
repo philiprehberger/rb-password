@@ -7,6 +7,11 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-04-09
+
+### Fixed
+- Replace hardcoded version assertion in spec with `not_to be_nil`.
+
 ## [0.3.2] - 2026-04-08
 
 ### Changed
