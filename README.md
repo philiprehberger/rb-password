@@ -38,6 +38,16 @@ result[:label]    # => :strong
 result[:entropy]  # => 72.08
 ```
 
+### Entropy Estimate
+
+Estimated password entropy in bits — `length * log2(pool_size)` where the pool is inferred from the character classes present:
+
+```ruby
+Philiprehberger::Password.entropy("aaaaaa")       # => 28.20
+Philiprehberger::Password.entropy("MyP@ssw0rd!")  # => 72.08
+Philiprehberger::Password.entropy("")             # => 0.0
+```
+
 ### Common Password Check
 
 ```ruby
@@ -135,6 +145,7 @@ result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 |--------|-------------|
 | `.common?(password)` | Returns `true` if password is in the common password dictionary |
 | `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
+| `.entropy(password)` | Estimated entropy in bits (Float) |
 | `.generate(**options)` | Generate a password (see options below) |
 | `.keyboard_patterns(password)` | Returns array of detected keyboard/sequence/repeat patterns |
 | `.hash(password, cost: 12)` | Hash password with bcrypt (requires bcrypt gem) |
