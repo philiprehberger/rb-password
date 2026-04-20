@@ -244,4 +244,36 @@ RSpec.describe Philiprehberger::Password do
       expect(result[:score]).to eq(4)
     end
   end
+
+  describe '.mask' do
+    it 'replaces every character with the default mask when visible is 0' do
+      expect(described_class.mask('Secret!')).to eq('*******')
+    end
+
+    it 'reveals the trailing characters requested' do
+      expect(described_class.mask('hunter2', visible: 2)).to eq('*****r2')
+    end
+
+    it 'returns the original password when visible exceeds its length' do
+      expect(described_class.mask('abc', visible: 10)).to eq('abc')
+    end
+
+    it 'accepts a custom mask character' do
+      expect(described_class.mask('abcd', mask: '•')).to eq('••••')
+    end
+
+    it 'returns an empty string for an empty input' do
+      expect(described_class.mask('')).to eq('')
+    end
+
+    it 'raises when visible is negative' do
+      expect { described_class.mask('abcd', visible: -1) }
+        .to raise_error(ArgumentError, /visible/)
+    end
+
+    it 'raises when mask is not a single character' do
+      expect { described_class.mask('abcd', mask: '**') }
+        .to raise_error(ArgumentError, /single character/)
+    end
+  end
 end

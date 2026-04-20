@@ -61,5 +61,27 @@ module Philiprehberger
     def self.zxcvbn(password)
       Zxcvbn.estimate(password)
     end
+
+    # Mask a password for safe display in logs, diagnostics, or UI surfaces.
+    # Reveals the trailing `visible` characters and replaces the rest with
+    # `mask` so that the full length of the password is still preserved.
+    # When `visible` is 0 (default) the entire password is masked.
+    #
+    # @param password [String] the password to mask
+    # @param visible [Integer] number of trailing characters to expose (>= 0)
+    # @param mask [String] single-character replacement for masked positions
+    # @return [String] the masked password
+    # @raise [ArgumentError] if visible is negative or mask is not one character
+    def self.mask(password, visible: 0, mask: '*')
+      raise ArgumentError, 'visible must be >= 0' if visible.negative?
+      raise ArgumentError, 'mask must be a single character' unless mask.is_a?(String) && mask.length == 1
+
+      str = password.to_s
+      return '' if str.empty?
+
+      reveal = [visible, str.length].min
+      masked_length = str.length - reveal
+      (mask * masked_length) + str[-reveal, reveal].to_s
+    end
   end
 end

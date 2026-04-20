@@ -7,6 +7,11 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-20
+
+### Added
+- `Password.mask(password, visible: 0, mask: '*')` — redact a password for logs or UI while preserving the original length. Reveals the trailing `visible` characters (defaults to none) and supports a custom single-character `mask`.
+
 ## [0.4.0] - 2026-04-15
 
 ### Added
