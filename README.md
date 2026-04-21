@@ -137,6 +137,14 @@ result[:crack_time_display] # => "minutes"
 result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 ```
 
+### Masking for Display
+
+```ruby
+Philiprehberger::Password.mask("hunter2")                 # => "*******"
+Philiprehberger::Password.mask("hunter2", visible: 2)     # => "*****r2"
+Philiprehberger::Password.mask("hunter2", mask: "•")      # => "•••••••"
+```
+
 ## API
 
 ### `Philiprehberger::Password`
@@ -151,6 +159,7 @@ result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 | `.hash(password, cost: 12)` | Hash password with bcrypt (requires bcrypt gem) |
 | `.verify(password, hash)` | Verify password against bcrypt hash (requires bcrypt gem) |
 | `.zxcvbn(password)` | Returns hash with `:score` (0-4), `:patterns`, `:crack_time_display` |
+| `.mask(password, visible: 0, mask: '*')` | Redact password for display; reveals trailing `visible` characters |
 
 ### Generate Options
 
