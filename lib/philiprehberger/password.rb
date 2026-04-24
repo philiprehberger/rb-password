@@ -34,6 +34,15 @@ module Philiprehberger
       Strength.entropy(password)
     end
 
+    # Strength score as a 0-4 integer. Convenience accessor that returns
+    # only the `:score` from {strength}.
+    #
+    # @param password [String] the password to evaluate
+    # @return [Integer] strength score (0 = very weak, 4 = very strong)
+    def self.score(password)
+      Strength.compute(password)[:score]
+    end
+
     def self.generate(**options)
       Generator.generate(**options)
     end

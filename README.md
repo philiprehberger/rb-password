@@ -48,6 +48,15 @@ Philiprehberger::Password.entropy("MyP@ssw0rd!")  # => 72.08
 Philiprehberger::Password.entropy("")             # => 0.0
 ```
 
+### Score Only
+
+Return the 0-4 integer score without the full strength hash:
+
+```ruby
+Philiprehberger::Password.score("password")    # => 0
+Philiprehberger::Password.score("MyP@ssw0rd!") # => 4
+```
+
 ### Common Password Check
 
 ```ruby
@@ -154,6 +163,7 @@ Philiprehberger::Password.mask("hunter2", mask: "•")      # => "••••�
 | `.common?(password)` | Returns `true` if password is in the common password dictionary |
 | `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
 | `.entropy(password)` | Estimated entropy in bits (Float) |
+| `.score(password)` | Strength score as integer 0-4 |
 | `.generate(**options)` | Generate a password (see options below) |
 | `.keyboard_patterns(password)` | Returns array of detected keyboard/sequence/repeat patterns |
 | `.hash(password, cost: 12)` | Hash password with bcrypt (requires bcrypt gem) |

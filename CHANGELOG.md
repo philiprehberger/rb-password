@@ -7,6 +7,11 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-23
+
+### Added
+- `Password.score(password)` — convenience accessor returning the 0-4 integer score without the full `strength` hash
+
 ## [0.5.0] - 2026-04-20
 
 ### Added

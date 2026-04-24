@@ -111,6 +111,30 @@ RSpec.describe Philiprehberger::Password do
     end
   end
 
+  describe '.score' do
+    it 'returns 0 for an empty password' do
+      expect(described_class.score('')).to eq(0)
+    end
+
+    it 'returns an integer' do
+      expect(described_class.score('abc')).to be_a(Integer)
+    end
+
+    it 'returns a value in the 0..4 range' do
+      expect(described_class.score('MyP@ssw0rd!')).to be_between(0, 4).inclusive
+    end
+
+    it 'agrees with the :score key from .strength' do
+      %w[a password123 MyP@ssw0rd! c0rr3ctH0rseB4tteryStapl3].each do |pw|
+        expect(described_class.score(pw)).to eq(described_class.strength(pw)[:score])
+      end
+    end
+
+    it 'gives stronger passwords a higher score than weaker ones' do
+      expect(described_class.score('aaaaaa')).to be < described_class.score('MyP@ssw0rd!')
+    end
+  end
+
   describe '.strength' do
     it 'returns terrible for empty password' do
       result = described_class.strength('')
