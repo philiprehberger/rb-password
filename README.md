@@ -146,6 +146,22 @@ result[:crack_time_display] # => "minutes"
 result[:patterns]           # => [{ type: :leet, token: "p@ssw0rd", ... }, ...]
 ```
 
+### Batch Strength
+
+Grade many passwords in one call. Useful for password audits across user
+lists or seeded test fixtures. Results are returned in input order; each
+element is coerced via `to_s` so non-string entries don't raise.
+
+```ruby
+results = Philiprehberger::Password.batch_strength([
+  "hunter2",
+  "P@ssw0rd!",
+  "C0rr3ctH0rseB4tt3ryStapl3"
+])
+results.map { |r| r[:score] }
+# => [0, 2, 4]
+```
+
 ### Masking for Display
 
 ```ruby
@@ -162,6 +178,7 @@ Philiprehberger::Password.mask("hunter2", mask: "•")      # => "••••�
 |--------|-------------|
 | `.common?(password)` | Returns `true` if password is in the common password dictionary |
 | `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
+| `.batch_strength(passwords)` | Returns array of strength hashes, one per password, in input order |
 | `.entropy(password)` | Estimated entropy in bits (Float) |
 | `.score(password)` | Strength score as integer 0-4 |
 | `.generate(**options)` | Generate a password (see options below) |

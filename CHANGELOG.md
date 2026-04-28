@@ -7,6 +7,11 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-04-27
+
+### Added
+- `Password.batch_strength(passwords)` — grade an enumerable of passwords in one call; returns an array of strength hashes in input order. Non-string elements are coerced via `to_s`. Raises `ArgumentError` for non-enumerable input.
+
 ## [0.6.0] - 2026-04-23
 
 ### Added

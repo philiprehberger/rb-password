@@ -166,6 +166,48 @@ RSpec.describe Philiprehberger::Password do
     end
   end
 
+  describe '.batch_strength' do
+    it 'returns an empty array for an empty input' do
+      expect(described_class.batch_strength([])).to eq([])
+    end
+
+    it 'preserves input order' do
+      passwords = ['', 'aaaaaa', 'C0mpl3x!P@ssw0rd#Long']
+      results = described_class.batch_strength(passwords)
+      scores = results.map { |r| r[:score] }
+      expect(scores[0]).to be <= scores[1]
+      expect(scores[1]).to be < scores[2]
+    end
+
+    it 'returns one strength hash per input' do
+      results = described_class.batch_strength(%w[a b c d])
+      expect(results.length).to eq(4)
+      results.each do |r|
+        expect(r).to have_key(:score)
+        expect(r).to have_key(:label)
+        expect(r).to have_key(:entropy)
+      end
+    end
+
+    it 'matches single-call strength results' do
+      passwords = %w[abc password123 MyP@ssw0rd!]
+      batched = described_class.batch_strength(passwords)
+      individual = passwords.map { |p| described_class.strength(p) }
+      expect(batched).to eq(individual)
+    end
+
+    it 'coerces non-string elements via to_s' do
+      result = described_class.batch_strength([12_345])
+      expect(result.length).to eq(1)
+      expect(result.first).to have_key(:score)
+    end
+
+    it 'raises ArgumentError for non-enumerable input' do
+      expect { described_class.batch_strength(42) }
+        .to raise_error(ArgumentError, /enumerable/)
+    end
+  end
+
   describe '.generate' do
     context 'with default style (random)' do
       it 'generates password of specified length' do

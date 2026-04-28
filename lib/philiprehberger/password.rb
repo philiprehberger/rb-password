@@ -25,6 +25,18 @@ module Philiprehberger
       Strength.compute(password)
     end
 
+    # Compute strength for a list of passwords in input order.
+    # Each element is coerced via `to_s` so non-string entries don't raise.
+    #
+    # @param passwords [Enumerable<String>] passwords to grade
+    # @return [Array<Hash>] strength hashes (one per input, same order)
+    # @raise [ArgumentError] if `passwords` is not enumerable
+    def self.batch_strength(passwords)
+      raise ArgumentError, 'passwords must be enumerable' unless passwords.respond_to?(:each)
+
+      passwords.map { |p| Strength.compute(p.to_s) }
+    end
+
     # Estimated entropy of the password in bits (log2(pool_size ^ length)).
     # Pool size is inferred from the character classes present.
     #
