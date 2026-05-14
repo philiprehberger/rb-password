@@ -135,6 +135,28 @@ RSpec.describe Philiprehberger::Password do
     end
   end
 
+  describe '.strong?' do
+    it 'is false for a weak password at the default threshold' do
+      expect(described_class.strong?('aaaaaa')).to be false
+    end
+
+    it 'is true for a strong, complex password at the default threshold' do
+      expect(described_class.strong?('c0rr3ctH0rseB4tteryStapl3!')).to be true
+    end
+
+    it 'respects a custom threshold' do
+      strong_pw = 'c0rr3ctH0rseB4tteryStapl3!'
+      expect(described_class.strong?(strong_pw, threshold: 0)).to be true
+      expect(described_class.strong?('aaaaaa', threshold: 0)).to be true
+    end
+
+    it 'agrees with score comparison' do
+      pw = 'MyP@ssw0rd!'
+      expect(described_class.strong?(pw, threshold: described_class.score(pw))).to be true
+      expect(described_class.strong?(pw, threshold: described_class.score(pw) + 1)).to be false
+    end
+  end
+
   describe '.strength' do
     it 'returns terrible for empty password' do
       result = described_class.strength('')

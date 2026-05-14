@@ -55,6 +55,19 @@ module Philiprehberger
       Strength.compute(password)[:score]
     end
 
+    # Predicate: is the password "strong enough"?
+    #
+    # Returns true when {score} is at least `threshold` (default 3, the
+    # "strong" tier on the 0-4 scale: terrible/weak/fair/strong/excellent).
+    # Use a higher `threshold` (e.g. 4) for stricter gating.
+    #
+    # @param password [String] the password to evaluate
+    # @param threshold [Integer] minimum acceptable score (0-4)
+    # @return [Boolean]
+    def self.strong?(password, threshold: 3)
+      score(password) >= threshold
+    end
+
     def self.generate(**options)
       Generator.generate(**options)
     end

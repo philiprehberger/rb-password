@@ -57,6 +57,16 @@ Philiprehberger::Password.score("password")    # => 0
 Philiprehberger::Password.score("MyP@ssw0rd!") # => 4
 ```
 
+### Strong Enough Predicate
+
+```ruby
+Philiprehberger::Password.strong?("password")                  # => false
+Philiprehberger::Password.strong?("MyP@ssw0rd!")               # => true
+Philiprehberger::Password.strong?("MyP@ssw0rd!", threshold: 4) # => true / false
+```
+
+Default `threshold:` is `3` (the "strong" tier on the 0-4 scale: terrible/weak/fair/strong/excellent). Raise it to `4` for stricter gating.
+
 ### Common Password Check
 
 ```ruby
@@ -181,6 +191,7 @@ Philiprehberger::Password.mask("hunter2", mask: "•")      # => "••••�
 | `.batch_strength(passwords)` | Returns array of strength hashes, one per password, in input order |
 | `.entropy(password)` | Estimated entropy in bits (Float) |
 | `.score(password)` | Strength score as integer 0-4 |
+| `.strong?(password, threshold: 3)` | Returns `true` when `score >= threshold` |
 | `.generate(**options)` | Generate a password (see options below) |
 | `.keyboard_patterns(password)` | Returns array of detected keyboard/sequence/repeat patterns |
 | `.hash(password, cost: 12)` | Hash password with bcrypt (requires bcrypt gem) |

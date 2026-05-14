@@ -7,6 +7,11 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-05-13
+
+### Added
+- `Password.strong?(password, threshold: 3)` — predicate returning `true` when `score >= threshold`. Default threshold corresponds to the "strong" tier on the 0-4 scale.
+
 ## [0.7.0] - 2026-04-27
 
 ### Added
@@ -136,8 +141,26 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PIN generation (digits only)
 - Built-in list of ~100 common passwords for rejection
 
-[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/philiprehberger/rb-password/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/philiprehberger/rb-password/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/philiprehberger/rb-password/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/philiprehberger/rb-password/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/philiprehberger/rb-password/compare/v0.3.3...v0.4.0
+[0.3.3]: https://github.com/philiprehberger/rb-password/compare/v0.3.2...v0.3.3
+[0.3.2]: https://github.com/philiprehberger/rb-password/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/philiprehberger/rb-password/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/philiprehberger/rb-password/compare/v0.2.2...v0.3.0
+[0.2.2]: https://github.com/philiprehberger/rb-password/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/philiprehberger/rb-password/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/philiprehberger/rb-password/compare/v0.1.9...v0.2.0
+[0.1.9]: https://github.com/philiprehberger/rb-password/compare/v0.1.8...v0.1.9
+[0.1.8]: https://github.com/philiprehberger/rb-password/compare/v0.1.7...v0.1.8
+[0.1.7]: https://github.com/philiprehberger/rb-password/compare/v0.1.6...v0.1.7
+[0.1.6]: https://github.com/philiprehberger/rb-password/compare/v0.1.5...v0.1.6
+[0.1.5]: https://github.com/philiprehberger/rb-password/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/philiprehberger/rb-password/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/philiprehberger/rb-password/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/philiprehberger/rb-password/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/philiprehberger/rb-password/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/philiprehberger/rb-password/releases/tag/v0.1.0
