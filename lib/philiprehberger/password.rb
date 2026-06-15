@@ -21,6 +21,10 @@ module Philiprehberger
       CommonPasswords.include?(password.to_s.downcase)
     end
 
+    # Compute strength of a single password.
+    #
+    # @param password [String] the password to evaluate
+    # @return [Hash] strength hash with `:score` (0-4), `:label`, `:entropy`, and `:feedback`
     def self.strength(password)
       Strength.compute(password)
     end
@@ -68,30 +72,53 @@ module Philiprehberger
       score(password) >= threshold
     end
 
+    # Generate a secure random password, passphrase, or PIN.
+    #
+    # @param length [Integer] password length (default 16; ignored for passphrase style)
+    # @param uppercase [Boolean] include uppercase letters (default true)
+    # @param lowercase [Boolean] include lowercase letters (default true)
+    # @param digits [Boolean] include digits (default true)
+    # @param symbols [Boolean] include symbols (default true)
+    # @param style [Symbol, nil] `:passphrase` or `:pin` for alternative styles
+    # @param words [Integer] word count for passphrase style (default 4)
+    # @param separator [String] separator for passphrase style (default "-")
+    # @return [String] the generated password
     def self.generate(**options)
       Generator.generate(**options)
     end
 
     # Detect keyboard patterns, sequences, and repeated characters.
-    # Returns an array of pattern hashes.
+    #
+    # @param password [String] the password to inspect
+    # @return [Array<Hash>] detected pattern hashes (keyboard rows, sequences, repeats)
     def self.keyboard_patterns(password)
       Patterns.detect(password)
     end
 
     # Hash a password using bcrypt.
     # Requires the bcrypt gem to be installed.
+    #
+    # @param password [String] the plaintext password to hash
+    # @param cost [Integer] bcrypt cost factor (4-31, default 12)
+    # @return [String] the bcrypt hash
     def self.hash(password, cost: 12)
       Hashing.hash(password, cost: cost)
     end
 
     # Verify a password against a bcrypt hash.
     # Requires the bcrypt gem to be installed.
+    #
+    # @param password [String] the plaintext password to verify
+    # @param hash [String] the bcrypt hash to verify against
+    # @return [Boolean] true when the password matches the hash
     def self.verify(password, hash)
       Hashing.verify(password, hash)
     end
 
     # Perform zxcvbn-style strength estimation.
-    # Returns a hash with :score, :patterns, and :crack_time_display.
+    #
+    # @param password [String] the password to evaluate
+    # @return [Hash] zxcvbn-style report with `:score`, `:patterns`, and `:crack_time_display`
     def self.zxcvbn(password)
       Zxcvbn.estimate(password)
     end
