@@ -38,6 +38,19 @@ result = Philiprehberger::Password.strength("MyP@ssw0rd!")
 result[:score]    # => 3
 result[:label]    # => :strong
 result[:entropy]  # => 72.08
+result[:feedback] # => [] (empty for strong passwords)
+```
+
+The `:feedback` key holds an array of actionable suggestions built from
+length, character-class, sequence, and common-password analysis. It is empty
+for passwords that already score "strong" or "excellent":
+
+```ruby
+Philiprehberger::Password.strength("helloworld")[:feedback]
+# => ["Use at least 12 characters", "Add uppercase letters, digits, and symbols"]
+
+Philiprehberger::Password.strength("password")[:feedback]
+# => ["Avoid using a common password", "Use at least 12 characters", "Add uppercase letters, digits, and symbols"]
 ```
 
 ### Entropy Estimate
@@ -147,6 +160,18 @@ Philiprehberger::Password.generate(style: :passphrase, words: 4, separator: "-")
 # PIN
 Philiprehberger::Password.generate(style: :pin, length: 6)
 # => "482917"
+
+# Pronounceable (alternating consonant/vowel syllables)
+Philiprehberger::Password.generate(style: :pronounceable, length: 12)
+# => "kotelu5mapib"
+
+# Exclude visually ambiguous characters (0 O o l I 1)
+Philiprehberger::Password.generate(length: 20, exclude_ambiguous: true)
+# => "kX9mZ2pQ7wR4bN5vTgHj"
+
+# Restrict to a custom symbol set
+Philiprehberger::Password.generate(length: 16, symbols: ["#", "$", "%"])
+Philiprehberger::Password.generate(length: 16, symbol_set: "#$%")
 ```
 
 ### zxcvbn-Style Strength Estimation
@@ -182,6 +207,20 @@ Philiprehberger::Password.mask("hunter2", visible: 2)     # => "*****r2"
 Philiprehberger::Password.mask("hunter2", mask: "•")      # => "•••••••"
 ```
 
+### Timing-Safe Comparison
+
+Compare secrets (tokens, hashes, API keys) without leaking timing information:
+
+```ruby
+Philiprehberger::Password.secure_compare("s3cr3t-token", "s3cr3t-token") # => true
+Philiprehberger::Password.secure_compare("s3cr3t-token", "wrong-token")  # => false
+```
+
+Uses the constant-time `OpenSSL.fixed_length_secure_compare` when both inputs
+share a byte length, and a length-masked constant-time fallback (returning
+`false` without early-exiting on the length difference) otherwise. No extra
+dependencies — OpenSSL ships with Ruby.
+
 ## API
 
 ### `Philiprehberger::Password`
@@ -189,7 +228,7 @@ Philiprehberger::Password.mask("hunter2", mask: "•")      # => "••••�
 | Method | Description |
 |--------|-------------|
 | `.common?(password)` | Returns `true` if password is in the common password dictionary |
-| `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy` |
+| `.strength(password)` | Returns hash with `:score` (0-4), `:label`, `:entropy`, and `:feedback` (array of suggestions) |
 | `.batch_strength(passwords)` | Returns array of strength hashes, one per password, in input order |
 | `.entropy(password)` | Estimated entropy in bits (Float) |
 | `.score(password)` | Strength score as integer 0-4 |
@@ -200,6 +239,7 @@ Philiprehberger::Password.mask("hunter2", mask: "•")      # => "••••�
 | `.verify(password, hash)` | Verify password against bcrypt hash (requires bcrypt gem) |
 | `.zxcvbn(password)` | Returns hash with `:score` (0-4), `:patterns`, `:crack_time_display` |
 | `.mask(password, visible: 0, mask: '*')` | Redact password for display; reveals trailing `visible` characters |
+| `.secure_compare(a, b)` | Timing-safe equality comparison for secrets (returns `true`/`false`) |
 
 ### Generate Options
 
@@ -209,8 +249,10 @@ Philiprehberger::Password.mask("hunter2", mask: "•")      # => "••••�
 | `uppercase` | true | Include uppercase letters |
 | `lowercase` | true | Include lowercase letters |
 | `digits` | true | Include digits |
-| `symbols` | true | Include symbols |
-| `style` | nil | `:passphrase` or `:pin` for alternative styles |
+| `symbols` | true | Include symbols; pass an array to use a custom symbol set |
+| `symbol_set` | nil | String of characters forming a custom symbol pool |
+| `exclude_ambiguous` | false | Drop visually ambiguous characters (`0 O o l I 1`) |
+| `style` | nil | `:passphrase`, `:pin`, or `:pronounceable` for alternative styles |
 | `words` | 4 | Word count for passphrase style |
 | `separator` | "-" | Separator for passphrase style |
 

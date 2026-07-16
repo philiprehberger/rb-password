@@ -10,6 +10,13 @@ module Philiprehberger
       DIGITS = ('0'..'9').to_a.freeze
       SYMBOLS = %w[! @ # $ % ^ & * - _ + = . ? ~].freeze
 
+      # Visually ambiguous characters dropped when `exclude_ambiguous: true`.
+      AMBIGUOUS = %w[0 O o l I 1].freeze
+
+      # Character pools for the pronounceable style.
+      CONSONANTS = %w[b c d f g h j k l m n p q r s t v w x z].freeze
+      VOWELS = %w[a e i o u].freeze
+
       # Expanded word list (200+ words) sourced from BIP39 and EFF short wordlists.
       # All words are lowercase, 3-8 characters, easy to type and remember.
       WORD_LIST = %w[
@@ -127,38 +134,43 @@ module Philiprehberger
         zebra zero zone
       ].uniq.freeze
 
-      def self.generate(length: 16, uppercase: true, lowercase: true, digits: true, symbols: true, style: nil,
-                        words: 4, separator: '-')
+      def self.generate(length: 16, style: nil, words: 4, separator: '-', **options)
         case style
         when :passphrase
           generate_passphrase(words: words, separator: separator)
         when :pin
           generate_pin(length: length)
+        when :pronounceable
+          generate_pronounceable(length: length,
+                                 digits: options.fetch(:digits, true),
+                                 symbols: options.fetch(:symbols, true))
         else
-          generate_random(length: length, uppercase: uppercase, lowercase: lowercase,
-                          digits: digits, symbols: symbols)
+          generate_random(length: length,
+                          uppercase: options.fetch(:uppercase, true),
+                          lowercase: options.fetch(:lowercase, true),
+                          digits: options.fetch(:digits, true),
+                          symbols: options.fetch(:symbols, true),
+                          exclude_ambiguous: options.fetch(:exclude_ambiguous, false),
+                          symbol_set: options.fetch(:symbol_set, nil))
         end
       end
 
-      def self.generate_random(length:, uppercase:, lowercase:, digits:, symbols:)
+      def self.generate_random(length:, uppercase:, lowercase:, digits:, symbols:, exclude_ambiguous:, symbol_set:)
+        pools = []
+        pools << LOWERCASE if lowercase
+        pools << UPPERCASE if uppercase
+        pools << DIGITS if digits
+        sym_pool = symbol_pool(symbols, symbol_set)
+        pools << sym_pool unless sym_pool.empty?
+
         chars = []
         required = []
+        pools.each do |pool|
+          filtered = exclude_ambiguous ? pool.reject { |c| AMBIGUOUS.include?(c) } : pool
+          next if filtered.empty?
 
-        if lowercase
-          chars.concat(LOWERCASE)
-          required << LOWERCASE
-        end
-        if uppercase
-          chars.concat(UPPERCASE)
-          required << UPPERCASE
-        end
-        if digits
-          chars.concat(DIGITS)
-          required << DIGITS
-        end
-        if symbols
-          chars.concat(SYMBOLS)
-          required << SYMBOLS
+          chars.concat(filtered)
+          required << filtered
         end
 
         return '' if chars.empty? || length <= 0
@@ -176,6 +188,45 @@ module Philiprehberger
         result.join
       end
 
+      # Resolve the symbol pool from the `symbols` and `symbol_set` options.
+      # `symbols` may be a boolean (use the default set) or an explicit array
+      # of characters; `symbol_set` is a string whose characters form the pool.
+      # Returns an empty array when symbols are disabled.
+      def self.symbol_pool(symbols, symbol_set)
+        return [] if symbols == false
+
+        if symbol_set
+          symbol_set.to_s.chars
+        elsif symbols.is_a?(Array)
+          symbols
+        else
+          SYMBOLS
+        end
+      end
+
+      # Generate an easy-to-say password built from alternating consonant and
+      # vowel positions, optionally replacing a position with a digit and/or a
+      # symbol. The requested length is always preserved.
+      def self.generate_pronounceable(length:, digits: true, symbols: true)
+        return '' if length <= 0
+
+        chars = Array.new(length) do |i|
+          pool = i.even? ? CONSONANTS : VOWELS
+          pool[SecureRandom.random_number(pool.length)]
+        end
+
+        inject_char(chars, DIGITS) if digits && length >= 2
+        inject_char(chars, SYMBOLS) if symbols && length >= 3
+
+        chars.join
+      end
+
+      # Replace a random position in `chars` with a character drawn from `pool`.
+      def self.inject_char(chars, pool)
+        idx = SecureRandom.random_number(chars.length)
+        chars[idx] = pool[SecureRandom.random_number(pool.length)]
+      end
+
       def self.generate_passphrase(words:, separator:)
         Array.new(words) { WORD_LIST[SecureRandom.random_number(WORD_LIST.length)] }.join(separator)
       end
@@ -184,7 +235,8 @@ module Philiprehberger
         Array.new(length) { SecureRandom.random_number(10).to_s }.join
       end
 
-      private_class_method :generate_random, :generate_passphrase, :generate_pin
+      private_class_method :generate_random, :generate_passphrase, :generate_pin,
+                           :generate_pronounceable, :symbol_pool, :inject_char
     end
   end
 end

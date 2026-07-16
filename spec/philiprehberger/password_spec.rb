@@ -186,6 +186,17 @@ RSpec.describe Philiprehberger::Password do
       expect(result[:entropy]).to be_a(Float)
       expect(result[:entropy]).to be > 0
     end
+
+    it 'includes actionable feedback for weak passwords' do
+      result = described_class.strength('abc')
+      expect(result[:feedback]).to be_an(Array)
+      expect(result[:feedback]).not_to be_empty
+    end
+
+    it 'returns empty feedback for strong passwords' do
+      result = described_class.strength('C0mpl3x!P@ssw0rd#2026LongEnough')
+      expect(result[:feedback]).to eq([])
+    end
   end
 
   describe '.batch_strength' do
@@ -362,6 +373,47 @@ RSpec.describe Philiprehberger::Password do
     it 'raises when mask is not a single character' do
       expect { described_class.mask('abcd', mask: '**') }
         .to raise_error(ArgumentError, /single character/)
+    end
+  end
+
+  describe '.secure_compare' do
+    it 'returns true for equal strings' do
+      expect(described_class.secure_compare('s3cr3t-token', 's3cr3t-token')).to be true
+    end
+
+    it 'returns false for strings of the same length that differ' do
+      expect(described_class.secure_compare('s3cr3t-token', 's3cr3t-toker')).to be false
+    end
+
+    it 'returns false for strings of different lengths' do
+      expect(described_class.secure_compare('short', 'a-much-longer-value')).to be false
+    end
+
+    it 'returns true for two empty strings' do
+      expect(described_class.secure_compare('', '')).to be true
+    end
+
+    it 'coerces non-string arguments' do
+      expect(described_class.secure_compare(12_345, 12_345)).to be true
+      expect(described_class.secure_compare(12_345, 54_321)).to be false
+    end
+  end
+
+  describe '.generate charset controls' do
+    it 'excludes ambiguous characters when requested' do
+      password = described_class.generate(length: 200, exclude_ambiguous: true)
+      %w[0 O o l I 1].each { |ch| expect(password).not_to include(ch) }
+    end
+
+    it 'uses only the provided custom symbols' do
+      password = described_class.generate(length: 40, uppercase: false, lowercase: false,
+                                          digits: false, symbols: %w[# $ %])
+      expect(password).to match(/\A[#$%]+\z/)
+    end
+
+    it 'generates a pronounceable password of the requested length' do
+      password = described_class.generate(style: :pronounceable, length: 16)
+      expect(password.length).to eq(16)
     end
   end
 end

@@ -33,6 +33,40 @@ RSpec.describe Philiprehberger::Password::Strength do
       result = described_class.compute('test')
       expect(result[:entropy]).to be_a(Float)
     end
+
+    it 'includes a feedback array' do
+      result = described_class.compute('test')
+      expect(result[:feedback]).to be_an(Array)
+    end
+  end
+
+  describe 'feedback' do
+    it 'suggests a longer password for short inputs' do
+      feedback = described_class.compute('abc')[:feedback]
+      expect(feedback).to include(a_string_matching(/at least 12 characters/))
+    end
+
+    it 'suggests missing character classes' do
+      feedback = described_class.compute('abcdef')[:feedback]
+      expect(feedback).to include(a_string_matching(/uppercase letters/))
+      expect(feedback).to include(a_string_matching(/digits/))
+      expect(feedback).to include(a_string_matching(/symbols/))
+    end
+
+    it 'warns about sequences' do
+      feedback = described_class.compute('abc123')[:feedback]
+      expect(feedback).to include(a_string_matching(/sequence/))
+    end
+
+    it 'warns about common passwords' do
+      feedback = described_class.compute('password')[:feedback]
+      expect(feedback).to include(a_string_matching(/common password/))
+    end
+
+    it 'returns an empty array for strong passwords' do
+      feedback = described_class.compute('C0mpl3x!P@ssw0rd#2026LongEnough')[:feedback]
+      expect(feedback).to eq([])
+    end
   end
 
   describe '.entropy' do

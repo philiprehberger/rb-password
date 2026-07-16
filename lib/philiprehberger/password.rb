@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'set'
+require 'openssl'
 
 require_relative 'password/version'
 require_relative 'password/common_passwords'
@@ -72,19 +73,44 @@ module Philiprehberger
       score(password) >= threshold
     end
 
-    # Generate a secure random password, passphrase, or PIN.
+    # Generate a secure random password, passphrase, PIN, or pronounceable password.
     #
     # @param length [Integer] password length (default 16; ignored for passphrase style)
     # @param uppercase [Boolean] include uppercase letters (default true)
     # @param lowercase [Boolean] include lowercase letters (default true)
     # @param digits [Boolean] include digits (default true)
-    # @param symbols [Boolean] include symbols (default true)
-    # @param style [Symbol, nil] `:passphrase` or `:pin` for alternative styles
+    # @param symbols [Boolean, Array<String>] include symbols; pass an array to use a custom symbol set
+    # @param symbol_set [String, nil] characters of a custom symbol pool (alternative to `symbols:` array)
+    # @param exclude_ambiguous [Boolean] drop visually ambiguous characters (0 O o l I 1)
+    # @param style [Symbol, nil] `:passphrase`, `:pin`, or `:pronounceable` for alternative styles
     # @param words [Integer] word count for passphrase style (default 4)
     # @param separator [String] separator for passphrase style (default "-")
     # @return [String] the generated password
     def self.generate(**options)
       Generator.generate(**options)
+    end
+
+    # Timing-safe string comparison. Uses the constant-time
+    # `OpenSSL.fixed_length_secure_compare` when both inputs are the same byte
+    # length, and a length-masked constant-time fallback (returning false
+    # without early-exiting on the length difference) otherwise.
+    #
+    # @param left [String] first value to compare
+    # @param right [String] second value to compare
+    # @return [Boolean] true when the two values are equal
+    def self.secure_compare(left, right)
+      a = left.to_s.b
+      b = right.to_s.b
+
+      return OpenSSL.fixed_length_secure_compare(a, b) if a.bytesize == b.bytesize
+
+      # Compare equal-length digests so we never branch purely on the byte
+      # size, then force false since differing lengths cannot be equal.
+      OpenSSL.fixed_length_secure_compare(
+        OpenSSL::Digest::SHA256.digest(a),
+        OpenSSL::Digest::SHA256.digest(b)
+      )
+      false
     end
 
     # Detect keyboard patterns, sequences, and repeated characters.

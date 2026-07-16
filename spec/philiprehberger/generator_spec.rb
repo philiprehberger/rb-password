@@ -54,6 +54,59 @@ RSpec.describe Philiprehberger::Password::Generator do
       expect(phrase).to include('_')
       expect(phrase).not_to include('-')
     end
+
+    context 'with exclude_ambiguous' do
+      it 'omits visually ambiguous characters' do
+        password = described_class.generate(length: 200, exclude_ambiguous: true)
+        described_class::AMBIGUOUS.each do |ch|
+          expect(password).not_to include(ch)
+        end
+      end
+
+      it 'still guarantees each requested character class' do
+        password = described_class.generate(length: 60, exclude_ambiguous: true)
+        expect(password).to match(/[a-z]/)
+        expect(password).to match(/[A-Z]/)
+        expect(password).to match(/\d/)
+      end
+    end
+
+    context 'with a custom symbol set' do
+      it 'only uses symbols from the provided array' do
+        password = described_class.generate(length: 60, uppercase: false, lowercase: false, digits: false,
+                                            symbols: %w[# $ %])
+        expect(password).to match(/\A[#$%]+\z/)
+      end
+
+      it 'only uses symbols from the provided symbol_set string' do
+        password = described_class.generate(length: 60, uppercase: false, lowercase: false, digits: false,
+                                            symbol_set: '#$%')
+        expect(password).to match(/\A[#$%]+\z/)
+      end
+    end
+
+    context 'with style: :pronounceable' do
+      it 'respects the requested length' do
+        expect(described_class.generate(style: :pronounceable, length: 14).length).to eq(14)
+      end
+
+      it 'alternates consonants and vowels when digits and symbols are disabled' do
+        password = described_class.generate(style: :pronounceable, length: 10, digits: false, symbols: false)
+        password.chars.each_with_index do |ch, i|
+          expect(ch).to match(/[a-z]/)
+          if i.even?
+            expect(described_class::VOWELS).not_to include(ch)
+          else
+            expect(described_class::VOWELS).to include(ch)
+          end
+        end
+      end
+
+      it 'uses SecureRandom' do
+        expect(SecureRandom).to receive(:random_number).at_least(:once).and_call_original
+        described_class.generate(style: :pronounceable, length: 12)
+      end
+    end
   end
 
   describe 'WORD_LIST' do
