@@ -15,3 +15,4 @@ Gemfile.lock
 *.swp
 .DS_Store
 vendor/
+/.bundle/

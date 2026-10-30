@@ -157,4 +157,89 @@ RSpec.describe Philiprehberger::Password::Policy do
       end
     end
   end
+
+  describe '#valid?' do
+    let(:policy) { described_class.new }
+
+    it 'returns true for a password that satisfies the policy' do
+      expect(policy.valid?('GoodP@ss123')).to be true
+    end
+
+    it 'returns false for a password that violates the policy' do
+      expect(policy.valid?('short')).to be false
+    end
+
+    it 'returns false for nil' do
+      expect(policy.valid?(nil)).to be false
+    end
+
+    it 'forwards context to validation' do
+      expect(policy.valid?('myjohnpass1', context: { username: 'john' })).to be false
+      expect(policy.valid?('Str0ng!Pwd', context: { username: 'john' })).to be true
+    end
+  end
+
+  describe 'min_unique_chars option' do
+    let(:policy) { described_class.new(min_unique_chars: 6, reject_common: false) }
+
+    it 'rejects passwords with too few distinct characters' do
+      result = policy.validate('abababab')
+      expect(result.valid?).to be false
+      expect(result.errors).to include('must contain at least 6 unique characters')
+    end
+
+    it 'accepts passwords meeting the distinct character count' do
+      expect(policy.valid?('abcdefab')).to be true
+    end
+
+    it 'treats different cases as distinct characters' do
+      expect(policy.valid?('aAbBcCaa')).to be true
+    end
+
+    it 'is disabled by default' do
+      expect(described_class.new(reject_common: false).valid?('aaaaaaaa')).to be true
+    end
+
+    it 'raises on non-positive values' do
+      expect { described_class.new(min_unique_chars: 0) }.to raise_error(ArgumentError, /min_unique_chars/)
+    end
+
+    it 'raises on non-integer values' do
+      expect { described_class.new(min_unique_chars: '3') }.to raise_error(ArgumentError, /min_unique_chars/)
+    end
+  end
+
+  describe 'max_repeated option' do
+    let(:policy) { described_class.new(max_repeated: 2, reject_common: false) }
+
+    it 'rejects runs longer than the limit' do
+      result = policy.validate('Paaassword1!')
+      expect(result.valid?).to be false
+      expect(result.errors).to include('must not repeat the same character more than 2 times in a row')
+    end
+
+    it 'accepts runs at the limit' do
+      expect(policy.valid?('Paassword1!')).to be true
+    end
+
+    it 'does not count non-consecutive repeats' do
+      expect(policy.valid?('abababab')).to be true
+    end
+
+    it 'is case-sensitive' do
+      expect(policy.valid?('aAaAaAaA')).to be true
+    end
+
+    it 'is disabled by default' do
+      expect(described_class.new(reject_common: false).valid?('aaaaaaaa')).to be true
+    end
+
+    it 'raises on non-positive values' do
+      expect { described_class.new(max_repeated: -1) }.to raise_error(ArgumentError, /max_repeated/)
+    end
+
+    it 'raises on non-integer values' do
+      expect { described_class.new(max_repeated: 1.5) }.to raise_error(ArgumentError, /max_repeated/)
+    end
+  end
 end

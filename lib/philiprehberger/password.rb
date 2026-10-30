@@ -14,6 +14,9 @@ require_relative 'password/zxcvbn'
 
 module Philiprehberger
   module Password
+    # Base error class for all errors raised by this gem.
+    class Error < StandardError; end
+
     # Check if a password appears in the common password dictionary.
     #
     # @param password [String] the password to check

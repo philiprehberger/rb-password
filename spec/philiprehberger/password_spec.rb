@@ -7,6 +7,10 @@ RSpec.describe Philiprehberger::Password do
     expect(Philiprehberger::Password::VERSION).not_to be_nil
   end
 
+  it 'defines a base Error class inheriting from StandardError' do
+    expect(Philiprehberger::Password::Error.ancestors).to include(StandardError)
+  end
+
   it 'has a version number' do
     expect(Philiprehberger::Password::VERSION).not_to be_nil
   end

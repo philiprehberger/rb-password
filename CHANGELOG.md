@@ -7,6 +7,18 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-30
+
+### Added
+- `Policy#valid?(password, context: {})` — boolean shortcut for `validate(...).valid?`.
+- `Policy.new(min_unique_chars:)` — require at least N distinct characters (`nil` disables).
+- `Policy.new(max_repeated:)` — reject runs of more than N identical consecutive characters (`nil` disables).
+- `Philiprehberger::Password::Error` base error class inheriting from `StandardError`.
+
+### Changed
+- Stopped tracking `.bundle/config` in git and added `/.bundle/` to `.gitignore`.
+- Restored the proposed-API placeholder and the alternatives field in the feature request issue template.
+
 ## [0.9.0] - 2026-07-15
 
 ### Added
@@ -157,7 +169,8 @@ and this gem adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - PIN generation (digits only)
 - Built-in list of ~100 common passwords for rejection
 
-[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/philiprehberger/rb-password/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/philiprehberger/rb-password/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/philiprehberger/rb-password/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/philiprehberger/rb-password/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/philiprehberger/rb-password/compare/v0.7.0...v0.8.0

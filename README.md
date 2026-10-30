@@ -98,13 +98,18 @@ policy = Philiprehberger::Password::Policy.new(
   require_digit: true,
   require_symbol: true,
   reject_common: true,
-  custom_passwords: ["companyname", "internalpass"]
+  custom_passwords: ["companyname", "internalpass"],
+  min_unique_chars: 6,
+  max_repeated: 2
 )
 
 result = policy.validate("short")
 result.valid?  # => false
 result.errors  # => ["must be at least 12 characters", ...]
 result.score   # => 0
+
+policy.valid?("Paaassword1!")   # => false (more than 2 repeated characters in a row)
+policy.valid?("Tr0ub4dor&Horse") # => true
 ```
 
 ### Context-Aware Validation
@@ -240,6 +245,7 @@ dependencies — OpenSSL ships with Ruby.
 | `.zxcvbn(password)` | Returns hash with `:score` (0-4), `:patterns`, `:crack_time_display` |
 | `.mask(password, visible: 0, mask: '*')` | Redact password for display; reveals trailing `visible` characters |
 | `.secure_compare(a, b)` | Timing-safe equality comparison for secrets (returns `true`/`false`) |
+| `Error` | Base error class (`StandardError` subclass) for errors raised by this gem |
 
 ### Generate Options
 
@@ -260,8 +266,11 @@ dependencies — OpenSSL ships with Ruby.
 
 | Method | Description |
 |--------|-------------|
-| `.new(**options)` | Create policy (min_length, max_length, require_uppercase, require_lowercase, require_digit, require_symbol, reject_common, custom_passwords) |
+| `.new(**options)` | Create policy (min_length, max_length, require_uppercase, require_lowercase, require_digit, require_symbol, reject_common, custom_passwords, min_unique_chars, max_repeated) |
+| `min_unique_chars:` | Require at least N distinct characters (`nil` disables; must be a positive Integer) |
+| `max_repeated:` | Reject runs of more than N identical consecutive characters (`nil` disables; must be a positive Integer) |
 | `#validate(password, context: {})` | Returns Result with `.valid?`, `.errors`, `.score`. Context accepts `:username`, `:email`, `:app_name` |
+| `#valid?(password, context: {})` | Boolean shortcut for `validate(password, context:).valid?` |
 
 ### Strength Labels
 
